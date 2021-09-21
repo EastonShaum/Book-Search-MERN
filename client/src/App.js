@@ -5,7 +5,8 @@ import {
   InMemoryCache,
   ApolloProvider,
   createHttpLink
-} from '@apollo/client'
+} from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
 import SearchBooks from './pages/SearchBooks';
 import SavedBooks from './pages/SavedBooks';
 import Navbar from './components/Navbar';
@@ -31,7 +32,7 @@ const client = new ApolloClient({
 
 function App() {
   return (
-    <ApolloProvider>
+    <ApolloProvider client={client}>
       <Router>
         <>
           <Navbar />
