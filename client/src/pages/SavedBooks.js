@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Jumbotron, Container, CardColumns, Card, Button } from 'react-bootstrap';
 
-import { useMutation } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client';
 import { REMOVE_BOOK } from '../utils/mutations';
 
 import { QUERY_ME } from '../utils/queries';
@@ -11,10 +11,14 @@ import Auth from '../utils/auth';
 import { removeBookId } from '../utils/localStorage';
 
 const SavedBooks = () => {
-  const [userData] = useMutation(QUERY_ME);
+  const { loading, data } = useQuery(QUERY_ME);
+  console.log(data)
+  // // use this to determine if `useEffect()` hook needs to run again
+  // const userDataLength = Object.keys(userData).length;
 
-  // use this to determine if `useEffect()` hook needs to run again
-  const userDataLength = Object.keys(userData).length;
+  const [removeBook, { error }] = useMutation(REMOVE_BOOK)
+
+  const userData = data?.me || {};
 
   // useEffect(() => {
   //   const getUserData = async () => {
@@ -42,9 +46,9 @@ const SavedBooks = () => {
   // }, [userDataLength]);
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
-  const handleDeleteBook = async (bookId) => {
+  const HandleDeleteBook = async (bookId) => {
     const token = Auth.loggedIn() ? Auth.getToken() : null;
-    const removeBook = useMutation(REMOVE_BOOK)
+    
     if (!token) {
       return false;
     }
@@ -69,7 +73,7 @@ const SavedBooks = () => {
   };
 
   // if data isn't here yet, say so
-  if (!userDataLength) {
+  if (loading) {
     return <h2>LOADING...</h2>;
   }
 
@@ -95,7 +99,7 @@ const SavedBooks = () => {
                   <Card.Title>{book.title}</Card.Title>
                   <p className='small'>Authors: {book.authors}</p>
                   <Card.Text>{book.description}</Card.Text>
-                  <Button className='btn-block btn-danger' onClick={() => handleDeleteBook(book.bookId)}>
+                  <Button className='btn-block btn-danger' onClick={() => HandleDeleteBook(book.bookId)}>
                     Delete this Book!
                   </Button>
                 </Card.Body>
